@@ -34,4 +34,22 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
+
+     - name: Install Doxygen
+      run: sudo apt-get install doxygen graphviz -y
+      shell: bash
+
+    - name: Generate Doxygen Documentation
+      run: doxygen ${{ inputs.config_file }}
+      shell: bash
       
+    - name: Create .nojekyll (ensures pages with underscores work on gh pages)
+      run: touch ${{ inputs.folder }}/.nojekyll
+      shell: bash
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        token: ${{ inputs.github_token }}
+        branch: ${{ inputs.branch }}
+        folder: ${{ inputs.folder }}
